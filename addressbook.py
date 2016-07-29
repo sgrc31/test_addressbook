@@ -5,12 +5,14 @@ import csv
 contact_list = {}
 
 class Contact:
-    def __init__(self, first, last, mail):
+    def __init__(self, first, last, mail, silent=False):
         self.first = first
         self.last = last
         self.mail = mail
+        self.silent = silent
         contact_list[self.first] = self
-        print('Contact created and added\n')
+        if not self.silent:
+            print('Contact created and added\n')
 
     def show_contact(self):
         print('    Name: {}'.format(self.first))
@@ -26,6 +28,17 @@ class Contact:
         self.last = last or self.last
         self.mail = mail or self.mail
         print('Contact updated\n')
+
+    @classmethod
+    def from_file(cls):
+        """Create Contact objects from cvs lines
+        """
+        with open('data.csv') as file:
+            data_reader = csv.reader(file)
+            for row in data_reader:
+                first, last, mail = row
+                cls(first, last, mail, True)
+
 
     @staticmethod
     def show_all():
@@ -47,6 +60,11 @@ class Contact:
 
 if __name__ == '__main__':
     print('Addressbook v0.1')
+    try:
+        Contact.from_file()
+        print('Contacts file successfully loaded') 
+    except FileNotFoundError:
+        pass
     while True:
         print('Select an option\n'
               '1 > Show all contacts\n'
